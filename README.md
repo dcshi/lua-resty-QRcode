@@ -1,4 +1,4 @@
-local resty_qr = require "resty.QRcode" 
+local resty_qr = require "resty.QRcode";
 
 local str = "http://dcshi.com";
 local file = "/tmp/qr.png";
