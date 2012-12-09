@@ -1,6 +1,6 @@
 CC      := gcc
 LD      := ld
-CFLAGS  :=
+CFLAGS  := -fPIC
 LIB		:= -lpng
 LDFLAGS := -shared -fpic
 SOURCE  := $(wildcard *.c)

@@ -1,8 +1,17 @@
-module("resty.QRcode", package.seeall)
+--module("resty.QRcode", package.seeall)
+
+local setmetatable = setmetatable
+local error = error
+local ffi = require("ffi")
+local HTTP_INTERNAL_SERVER_ERROR = ngx.HTTP_INTERNAL_SERVER_ERROR
+local HTTP_OK = ngx.HTTP_OK
+
+module(...)
 
 _VERSION = '0.01'
 
-local ffi = require("ffi")
+local mt = { __index = _M } 
+
 --local img_dir = "./img/"
 
 ffi.cdef[[
@@ -45,7 +54,6 @@ void init(imgPro *pro, int size, int margin, int dpi, const char *fg_val, const 
 int save(imgPro *pro, QRcode *qrcode, const char *outfile);
 ]]
 
-local mt = { __index = resty.QRcode }
 local qr = ffi.load("qrencode")
 local img = ffi.load("img")
 local img_pro_ptr = ffi.typeof("imgPro[1]")
@@ -62,8 +70,17 @@ function saveQr(self, txt, level, mode, outfile)
 	local res = img.save(self._pro, qrcode, outfile)
 
 	if res  == -1 then
-	    return ngx.HTTP_INTERNAL_SERVER_ERROR
+	    return HTTP_INTERNAL_SERVER_ERROR
 	end
 	
-	return ngx.HTTP_OK
+	return HTTP_OK
 end
+
+local class_mt = {
+	-- to prevent use of casual module global variables
+	__newindex = function (table, key, val)
+		error('attempt to write to undeclared variable "' .. key .. '"')
+	end
+}
+
+setmetatable(_M, class_mt)
